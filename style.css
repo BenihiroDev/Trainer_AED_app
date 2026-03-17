@@ -5,7 +5,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 90vh;
     margin: 0;
 }
 
@@ -13,7 +13,7 @@ body {
 /* AED container - white box */
 .aed-body {
     width: 80vw;
-    height: 80vh;
+    height: 60vh;
     background-color: #eef5f9;
     border-radius: 5%;
     position: relative;
@@ -26,8 +26,8 @@ body {
   position: absolute;
   top: 3.5%;
   right: 5%;
-    width: 45vw;
-    height: 75vh;
+    width: 55vw;
+    height: 55vh;
     background-color: #5c8fa9;
     border-radius: 5%;
     
@@ -36,10 +36,10 @@ body {
 
 #power-button {
   position: absolute;
-    top: 10%;
+    top: 8%;
     right: 10%;
- width: 20vw;   
- height: 20vw;
+ width: 25vw;   
+ height: 25vw;
  border-radius: 50%; /* circle */
  border: 1.5vw solid white;
   background-color: green;
@@ -55,7 +55,7 @@ body {
 #white-box {
   position: absolute;
     top: 43%;
-    right: 10%;
+    right: 15%;
     width: 20vw;
     height: 20vw;
     background-color: white;
@@ -87,25 +87,25 @@ body {
 */
 #shock-outline {
     position: absolute;
-   bottom: 8.5%;
-   right: 3.5%;
+   bottom: 7%;
+   right: 2.5%;
  width: 0;
  height: 0;
-    border-left: 13vw solid transparent;   /* triangle half-width relative to AED */
-    border-right: 13vw solid transparent;  /* triangle half-width relative to AED */
-    border-bottom: 18vw solid rgb(255, 255, 255);      /* triangle height relative to AED */
+    border-left: 17vw solid transparent;   /* triangle half-width relative to AED */
+    border-right: 17vw solid transparent;  /* triangle half-width relative to AED */
+    border-bottom: 25vw solid rgb(255, 255, 255);      /* triangle height relative to AED */
     border-radius: 20%; /* slight rounding for better aesthetics */
 }
 
 #shock-button {
 position: absolute;
-   bottom: 10%;
-   right: 10%;
+   bottom: 8%;
+   right: 8%;
  width: 0;
  height: 0;
-    border-left: 10vw solid transparent;   /* triangle half-width relative to AED */
-    border-right: 10vw solid transparent;  /* triangle half-width relative to AED */
-    border-bottom: 15vw solid orange;      /* triangle height relative to AED */
+    border-left: 14vw solid transparent;   /* triangle half-width relative to AED */
+    border-right: 14vw solid transparent;  /* triangle half-width relative to AED */
+    border-bottom: 22vw solid orange;      /* triangle height relative to AED */
     border-radius: 20%; /* slight rounding for better aesthetics */
     z-index: 1;
 }
