@@ -13,7 +13,7 @@ body {
 /* AED container - white box */
 .aed-body {
     width: 75vw;
-    height: 90vh;
+    height: 80vh;
     background-color: #eef5f9;
     border-radius: 5%;
     position: relative;
@@ -27,7 +27,7 @@ body {
   top: 3.5%;
   right: 5%;
     width: 45vw;
-    height: 85vh;
+    height: 75vh;
     background-color: #5c8fa9;
     border-radius: 5%;
     
