@@ -12,8 +12,8 @@ body {
 
 /* AED container - white box */
 .aed-body {
-    width: 75vw;
-    height: 90vh;
+    width: 80vw;
+    height: 80vh;
     background-color: #eef5f9;
     border-radius: 5%;
     position: relative;
@@ -27,7 +27,7 @@ body {
   top: 3.5%;
   right: 5%;
     width: 45vw;
-    height: 85vh;
+    height: 75vh;
     background-color: #5c8fa9;
     border-radius: 5%;
     
@@ -44,7 +44,7 @@ body {
  border: 1.5vw solid white;
   background-color: green;
   color: white;
-    font-size: 7vw;
+    font-size: 5vw;
     color: rgb(170, 205, 170);
     display: flex;
     justify-content: center;
@@ -54,7 +54,7 @@ body {
 
 #white-box {
   position: absolute;
-    top: 40%;
+    top: 43%;
     right: 10%;
     width: 20vw;
     height: 20vw;
@@ -112,10 +112,10 @@ position: absolute;
 
 #shock-icon {
     position: absolute;
-    bottom: 9%;           
-    right: 22%;
-    font-size: 10vw;     /* adjust size */
-    color: white;
+    bottom: 10.5%;           
+    right: 17.5%;
+    font-size: 5vw;     /* adjust size */
+    color: rgb(141, 61, 17);
     pointer-events: none;   /* icon doesn’t block clicks */
     z-index: 2;
 }
