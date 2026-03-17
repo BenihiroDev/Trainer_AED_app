@@ -114,7 +114,7 @@ position: absolute;
     position: absolute;
     bottom: 9%;           
     right: 22%;
-    font-size: 6rem;     /* adjust size */
+    font-size: 10vw;     /* adjust size */
     color: white;
     pointer-events: none;   /* icon doesn’t block clicks */
     z-index: 2;
@@ -132,7 +132,7 @@ position: absolute;
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-size: 5rem;
+    font-size: 9vw;
     color: white;
 }
 
@@ -148,7 +148,7 @@ position: absolute;
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-size: 5rem;
+    font-size: 9vw;
     color: white;
 }
 
@@ -164,7 +164,7 @@ position: absolute;
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-size: 5rem;
+    font-size: 9vw;
     color: white;
 }
 
