@@ -7,6 +7,24 @@ const closePopup = document.getElementById("close-popup");
 let powerOn = false;
 let pressTimer;
 
+// Prevent context menu (right-click) to disable saving/sharing
+document.addEventListener('contextmenu', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+// Prevent drag and drop of images
+document.addEventListener('dragstart', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+// Prevent text selection on mobile
+document.addEventListener('selectstart', function(e) {
+  e.preventDefault();
+  return false;
+});
+
 // Track which zone each pad is snapped to (null if not snapped)
 const padZoneMap = {
   pad1: null,
@@ -14,15 +32,15 @@ const padZoneMap = {
 };
 
 // Predetermined snap coordinates for each pad in each zone
-// Coordinates are relative to the popup-content container
+// Coordinates are relative to the body image (percentages of image dimensions)
 const snapCoordinates = {
   pad1: {
-    zone1: { top: '23%', left: '30%' },
-    zone2: { top: '40%', right: '27%' }
+    zone1: { imageOffsetX: '35%', imageOffsetY: '37%' },
+    zone2: { imageOffsetX: '70%', imageOffsetY: '60%' }
   },
   pad2: {
-    zone1: { top: '23%', left: '30%' },
-    zone2: { top: '40%', right: '27%' }
+    zone1: { imageOffsetX: '35%', imageOffsetY: '37%' },
+    zone2: { imageOffsetX: '70%', imageOffsetY: '60%' }
   }
 };
 
@@ -35,19 +53,56 @@ powerButton.addEventListener("click", function() {
   if (powerOn) {
     powerButton.classList.add("on");
     padConnector.classList.add("active");
+    padConnector.style.pointerEvents = "auto";
+    padConnector.style.opacity = "1";
   } else {
     powerButton.classList.remove("on");
     padConnector.classList.remove("active");
+    resetToInitialState();
   }
 });
 
 
-/* PADS POP-UP */
+/* UTILITY: Reset to initial state */
+function resetToInitialState() {
+  // Reset pad zone map
+  padZoneMap.pad1 = null;
+  padZoneMap.pad2 = null;
+  
+  // Reset pad positions and styles
+  const pad1 = document.getElementById("pad1");
+  const pad2 = document.getElementById("pad2");
+  
+  if (pad1) {
+    pad1.style.top = "";
+    pad1.style.left = "";
+    pad1.style.right = "";
+    pad1.style.bottom = "";
+    pad1.classList.remove("snapped");
+  }
+  
+  if (pad2) {
+    pad2.style.top = "";
+    pad2.style.left = "";
+    pad2.style.right = "";
+    pad2.style.bottom = "";
+    pad2.classList.remove("snapped");
+  }
+  
+  // Reset pad connector to initial state
+  padConnector.classList.remove("active");
+  padConnector.classList.remove("completed");
+  padConnector.style.pointerEvents = "auto";
+  padConnector.style.opacity = "1";
+  
+  // Hide popup
+  padPopup.classList.add("hidden");
+}
 function startPress() {
   if (powerOn) {
     pressTimer = setTimeout(function() {
       padPopup.classList.remove("hidden");
-    }, 1000);
+    }, 100);
   }
 }
 
@@ -96,6 +151,8 @@ function checkAndSnapPads() {
   const pad2 = document.getElementById("pad2");
   const zone1 = document.getElementById("zone1");
   const zone2 = document.getElementById("zone2");
+  const bodyImage = document.getElementById("body-image");
+  const popupContent = document.querySelector(".popup-content");
   
   // Get overlap percentages for each pad in each zone
   const pad1Zone1Overlap = getOverlapPercentage(pad1, zone1);
@@ -121,6 +178,34 @@ function checkAndSnapPads() {
     pad2Zone = null;
   }
   
+  // Helper function to calculate snap position relative to body image
+  function calculateSnapPosition(padId, zone) {
+    const coords = snapCoordinates[padId][`zone${zone}`];
+    const bodyImageRect = bodyImage.getBoundingClientRect();
+    const popupContentRect = popupContent.getBoundingClientRect();
+    
+    // Calculate image position relative to popup-content
+    const imageLeftInPopup = bodyImageRect.left - popupContentRect.left;
+    const imageTopInPopup = bodyImageRect.top - popupContentRect.top;
+    
+    // Parse percentage values
+    const offsetXPercent = parseFloat(coords.imageOffsetX) / 100;
+    const offsetYPercent = parseFloat(coords.imageOffsetY) / 100;
+    
+    // Calculate absolute position within popup-content
+    const left = imageLeftInPopup + (bodyImageRect.width * offsetXPercent);
+    const top = imageTopInPopup + (bodyImageRect.height * offsetYPercent);
+    
+    // Center the pad on that point
+    const padWidth = pad1.offsetWidth;
+    const padHeight = pad1.offsetHeight;
+    
+    return {
+      top: (top - padHeight / 2) + 'px',
+      left: (left - padWidth / 2) + 'px'
+    };
+  }
+  
   // Update pad1
   padZoneMap.pad1 = pad1Zone;
   if (pad1Zone) {
@@ -131,8 +216,9 @@ function checkAndSnapPads() {
     pad1.style.top = '';
     pad1.style.bottom = '';
     // Apply new coordinates
-    const coords = snapCoordinates.pad1[`zone${pad1Zone}`];
-    Object.assign(pad1.style, coords);
+    const snapPos = calculateSnapPosition('pad1', pad1Zone);
+    pad1.style.top = snapPos.top;
+    pad1.style.left = snapPos.left;
   } else {
     pad1.classList.remove("snapped");
   }
@@ -147,10 +233,28 @@ function checkAndSnapPads() {
     pad2.style.top = '';
     pad2.style.bottom = '';
     // Apply new coordinates
-    const coords = snapCoordinates.pad2[`zone${pad2Zone}`];
-    Object.assign(pad2.style, coords);
+    const snapPos = calculateSnapPosition('pad2', pad2Zone);
+    pad2.style.top = snapPos.top;
+    pad2.style.left = snapPos.left;
   } else {
     pad2.classList.remove("snapped");
+  }
+  
+  // Check if both pads are successfully snapped
+  if (padZoneMap.pad1 !== null && padZoneMap.pad2 !== null) {
+    // Change pad connector to completed state (stops blinking, keeps darker color)
+    padConnector.classList.remove("active");
+    padConnector.classList.add("completed");
+    padConnector.style.pointerEvents = "none";
+    
+    // Play audio immediately (within user gesture for mobile compatibility)
+    const beep2Audio = new Audio("audio/beep2.mp3");
+    beep2Audio.play().catch(error => console.log("Beep2 play error:", error));
+    
+    // Close popup after a delay to let user see the snap
+    setTimeout(function() {
+      padPopup.classList.add("hidden");
+    }, 500);
   }
 }
 

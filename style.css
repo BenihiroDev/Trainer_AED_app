@@ -9,7 +9,11 @@ body {
     margin: 0;
 
   -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 
@@ -96,6 +100,8 @@ button:active {
     align-items: center;
     text-align: center;
     font-size: 2.5vw;
+    font-style: italic;
+    line-height: 1.3;
 }
 
 /*
@@ -240,12 +246,28 @@ user-select: none;
 touch-action: manipulation;
 }
 
+/* Blinking animation for yellow border */
+@keyframes blink-border {
+  0%, 50% { border-color: yellow; }
+  51%, 100% { border-color: transparent; }
+}
+
 #pad-connector.active {
   position: absolute;
     top: 9%;
     left: 4%;
   opacity: 1;
   border: 1vw solid yellow;
+  animation: blink-border 1s infinite;
+}
+
+#pad-connector.completed {
+  position: absolute;
+    top: 9%;
+    left: 4%;
+  opacity: 0.5;
+  border: none;
+  animation: none;
 }
 
 #pad-popup {
@@ -281,6 +303,12 @@ touch-action: manipulation;
   display: block;
   margin: 0 auto 20px auto;
   position: relative;
+  pointer-events: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
 }
 
 
@@ -300,7 +328,7 @@ touch-action: manipulation;
 
 .pad.snapped {
   background-color: lightgray;
-  border: 3px solid rgb(26, 156, 26);
+  border: 4px solid rgb(26, 156, 26);
 }
 
 #pad1 {
