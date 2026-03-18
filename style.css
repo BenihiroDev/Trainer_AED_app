@@ -295,7 +295,12 @@ touch-action: manipulation;
   align-items: center;
   cursor: grab;
   position: absolute;
-  touch-action: none
+  touch-action: none;transition: background-color 0.3s ease;  
+}
+
+.pad.snapped {
+  background-color: lightgray;
+  border: 3px solid rgb(26, 156, 26);
 }
 
 #pad1 {
@@ -311,17 +316,19 @@ touch-action: manipulation;
 
 .target-zone {
   position: absolute;
-  width: 23vw;
-  height: 23vw;
   border-radius: 50%;
   background-color: rgba(0, 255, 0, 0.2); /* semi-transparent for testing */
 }
 
 #zone1 {
-  top: 20%; 
-  left: 24%;
+  top: 21%; 
+  left: 26%;
+  width: 19vw;
+  height: 19vw;
 }
 #zone2 {
-  top: 35%; 
-  right: 25%;
+  top: 38%; 
+  right: 23%;
+  width: 18vw;
+  height: 18vw;
 }
