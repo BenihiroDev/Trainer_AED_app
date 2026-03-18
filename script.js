@@ -119,26 +119,3 @@ function dragMoveTouch(e) {
 makeDraggable(document.getElementById("pad1"));
 makeDraggable(document.getElementById("pad2"));
 
-
-function checkPadPlacement(pad, zone) {
-  const padRect = pad.getBoundingClientRect();
-  const zoneRect = zone.getBoundingClientRect();
-
-  // Simple overlap detection
-  const overlap = !(
-    padRect.right < zoneRect.left ||
-    padRect.left > zoneRect.right ||
-    padRect.bottom < zoneRect.top ||
-    padRect.top > zoneRect.bottom
-  );
-
-  return overlap;
-}
-
-if (checkPadPlacement(pad, document.getElementById("zone1"))) {
-  console.log(pad.id + " in zone1!");
-}
-
-if (checkPadPlacement(pad, document.getElementById("zone2"))) {
-  console.log(pad.id + " in zone2!");
-}

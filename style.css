@@ -285,8 +285,8 @@ touch-action: manipulation;
 
 
 .pad {
-  width: 50px;
-  height: 70px;
+  width: 9vw;
+  height: 13vw;
   background-color: lightgray;
   border: 2px solid black;
   border-radius: 8px;
@@ -318,10 +318,10 @@ touch-action: manipulation;
 }
 
 #zone1 {
-  top: 20%;  /* adjust for pad1 */
+  top: 20%; 
   left: 24%;
 }
 #zone2 {
-  top: 35%;  /* adjust for pad2 */
+  top: 35%; 
   right: 25%;
 }
