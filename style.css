@@ -22,7 +22,7 @@ body {
 .aed-body {
     width: 80vw;
     height: 60vh;
-    background-color: #eef5f9;
+    background-color: #fcebff;
     border-radius: 5%;
     position: relative;
     padding: 1%; 
@@ -36,7 +36,7 @@ body {
   right: 5%;
     width: 55vw;
     height: 55vh;
-    background-color: #5c8fa9;
+    background-color: #94425f;
     border-radius: 5%;
     
 }
@@ -61,7 +61,7 @@ button:active {
  height: 29vw;
  border-radius: 50%; /* circle */
  border: none;
-  background-color: white;
+  background-color: #fcebff;
   box-shadow: 0px 0px 0px rgba(0,0,0,0.3);
 }
 
@@ -74,18 +74,65 @@ button:active {
  border-radius: 50%; /* circle */
  border: none;
   background-color: green;
-  color: white;
+  color: rgb(170, 205, 170);
     font-size: 15vw;
-    color: rgb(170, 205, 170);
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif;
+    box-shadow: 0 10px 0 rgba(0,0,0,0.2), 0 18px 25px rgba(0,0,0,0.35);
+    text-shadow: 0 4px 6px rgba(0,0,0,0.5);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #power-button.on {
   background-color: limegreen;
   color: rgb(119, 237, 119);
+}
+
+#power-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 8px 12px rgba(0,0,0,0.25);
+  text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+}
+
+#power-button:active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.15);
+}
+#indic-bulb-1 {
+  position: absolute;
+  top: 38%;
+  right: 30%;
+  width: 3vw;
+  height: 3vw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #333333, #000000);
+  box-shadow: 
+    inset -1px -1px 3px rgba(0, 0, 0, 0.8),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.1),
+    0px 2px 4px rgba(0, 0, 0, 0.5);
+  border: 1px solid #1a1a1a;
+  z-index: 10;
+}
+
+#indic-bulb-2 {
+  position: absolute;
+  top: 63%;
+  right: 30%;
+  width: 3vw;
+  height: 3vw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #333333, #000000);
+  box-shadow: 
+    inset -1px -1px 3px rgba(0, 0, 0, 0.8),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.1),
+    0px 2px 4px rgba(0, 0, 0, 0.5);
+  border: 1px solid #1a1a1a;
+  z-index: 10;
 }
 
 #white-box {
@@ -94,7 +141,7 @@ button:active {
     right: 15%;
     width: 20vw;
     height: 20vw;
-    background-color: white;
+    background-color: #fcebff;
     border-radius: 3%;
     display: flex;
     justify-content: center;
@@ -131,46 +178,46 @@ button:active {
  height: 0;
     border-left: 17vw solid transparent;   /* triangle half-width relative to AED */
     border-right: 17vw solid transparent;  /* triangle half-width relative to AED */
-    border-bottom: 25vw solid rgb(255, 255, 255);      /* triangle height relative to AED */
+    border-bottom: 25vw solid #fcebff;      /* triangle height relative to AED */
     border-radius: 20%; /* slight rounding for better aesthetics */
 box-shadow: 0px 0px 0px rgba(0,0,0,0.3);
 }
 
-#shock-duller {
-  position: absolute;
-   bottom: 8%;
-   right: 8%;
- width: 0;
- height: 0;
-    border-left: 14vw solid transparent;   /* triangle half-width relative to AED */
-    border-right: 14vw solid transparent;  /* triangle half-width relative to AED */
-    border-bottom: 22vw solid black;      /* triangle height relative to AED */
-    border-radius: 20%; /* slight rounding for better aesthetics */
-}
-
 #shock-button {
-position: absolute;
-   bottom: 8%;
-   right: 8%;
- width: 0;
- height: 0;
-    border-left: 14vw solid transparent;   /* triangle half-width relative to AED */
-    border-right: 14vw solid transparent;  /* triangle half-width relative to AED */
-    border-bottom: 22vw solid orange;      /* triangle height relative to AED */
-    border-radius: 20%; /* slight rounding for better aesthetics */
-    z-index: 1;
+  position: absolute;
+  bottom: 8%;
+  right: 8%;
+  width: 0;
+  height: 0;
+  border-left: 14vw solid transparent;   /* triangle half-width relative to AED */
+  border-right: 14vw solid transparent;  /* triangle half-width relative to AED */
+  border-bottom: 22vw solid rgb(127, 92, 27);      /* triangle height relative to AED */
+  border-radius: 20%; /* slight rounding for better aesthetics */
+  z-index: 1;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.25));
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+#shock-button:active {
+  transform: translateY(4px);
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+}
 
 #shock-icon {
     position: absolute;
     bottom: 7%;           
     right: 26%;
     font-size: 15vw;     /* adjust size */
-    color: rgb(168, 97, 58);
+    color: rgba(72, 42, 0, 0.7);
     pointer-events: none;   /* icon doesn’t block clicks */
     z-index: 2;
     font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.5);
+}
+
+#shock-icon:active {
+  color: rgba(40, 25, 0, 0.8);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
 
@@ -186,7 +233,7 @@ position: absolute;
  width: 10vw;
  height: 10vw;
  border-radius: 3%;
-   background-color: #5c8fa9;
+   background-color: #94425f;
    display: flex;
     justify-content: center;
     align-items: center;
@@ -202,7 +249,7 @@ position: absolute;
  width: 10vw;
  height: 10vw;
  border-radius: 3%;
-   background-color: #5c8fa9;
+   background-color: #94425f;
    display: flex;
     justify-content: center;
     align-items: center;
@@ -218,7 +265,7 @@ position: absolute;
  width: 10vw;
  height: 10vw;
  border-radius: 3%;
-   background-color: #5c8fa9;
+   background-color: #94425f;
    display: flex;
     justify-content: center;
     align-items: center;
@@ -250,7 +297,7 @@ touch-action: manipulation;
 
 /* Blinking animation for yellow border */
 @keyframes blink-border {
-  0%, 50% { border-color: yellow; }
+  0%, 50% { border-color: rgb(255, 217, 0); }
   51%, 100% { border-color: transparent; }
 }
 
@@ -259,7 +306,7 @@ touch-action: manipulation;
     top: 9%;
     left: 4%;
   opacity: 1;
-  border: 1vw solid yellow;
+  border: 1vw solid rgb(255, 217, 0);
   animation: blink-border 1s infinite;
 }
 

@@ -4,6 +4,10 @@ const padConnector = document.getElementById("pad-connector");
 const padPopup = document.getElementById("pad-popup");
 const closePopup = document.getElementById("close-popup");
 
+// Debug: Verify elements are found
+console.log("Power Button found:", powerButton);
+console.log("Pad Connector found:", padConnector);
+
 let powerOn = false;
 let pressTimer;
 
@@ -47,15 +51,19 @@ const snapCoordinates = {
 
 /* POWER BUTTON CLICKY */
 powerButton.addEventListener("click", function() {
+  console.log("Power button clicked! PowerOn state before:", powerOn);
   powerOn = !powerOn;
+  console.log("PowerOn state after:", powerOn);
   beep.play();
 
   if (powerOn) {
+    console.log("Turning power ON");
     powerButton.classList.add("on");
     padConnector.classList.add("active");
     padConnector.style.pointerEvents = "auto";
     padConnector.style.opacity = "1";
   } else {
+    console.log("Turning power OFF");
     powerButton.classList.remove("on");
     padConnector.classList.remove("active");
     resetToInitialState();
