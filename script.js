@@ -48,6 +48,40 @@ const snapCoordinates = {
   }
 };
 
+// Indicator bulbs (used later for alert blink)
+const indicator1 = document.getElementById("indic-bulb-1");
+const indicator2 = document.getElementById("indic-bulb-2");
+const shockButton = document.getElementById("shock-button");
+
+function startIndicatorAlert() {
+  if (indicator1) indicator1.classList.add("alert-1");
+  if (indicator2) indicator2.classList.add("alert-2");
+}
+
+function stopIndicatorAlert() {
+  if (indicator1) indicator1.classList.remove("alert-1");
+  if (indicator2) indicator2.classList.remove("alert-2");
+}
+
+function activateShockButton() {
+  if (shockButton) {
+    shockButton.classList.add("alert");
+  }
+}
+
+function deactivateShockButton() {
+  if (shockButton) {
+    shockButton.classList.remove("alert");
+  }
+}
+
+// When the shock button is pressed, stop the alert state
+if (shockButton) {
+  shockButton.addEventListener("click", function() {
+    deactivateShockButton();
+  });
+}
+
 
 /* POWER BUTTON CLICKY */
 powerButton.addEventListener("click", function() {
@@ -255,9 +289,21 @@ function checkAndSnapPads() {
     padConnector.classList.add("completed");
     padConnector.style.pointerEvents = "none";
     
-    // Play audio immediately (within user gesture for mobile compatibility)
+    // Play beep2, then chain beep3 when it ends
     const beep2Audio = new Audio("audio/beep2.mp3");
     beep2Audio.play().catch(error => console.log("Beep2 play error:", error));
+    
+    beep2Audio.onended = function() {
+      // Start alternating red blink on the indicator bulbs
+      startIndicatorAlert();
+
+      const beep3Audio = new Audio("audio/beep3.mp3");
+      beep3Audio.play().catch(err => console.log("Beep3 play error:", err));
+      
+      beep3Audio.onended = function() {
+        activateShockButton();
+      };
+    };
     
     // Close popup after a delay to let user see the snap
     setTimeout(function() {
