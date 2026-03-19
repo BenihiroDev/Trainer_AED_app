@@ -63,8 +63,30 @@ function stopIndicatorAlert() {
   if (indicator2) indicator2.classList.remove("alert-2");
 }
 
+function activateShockButton() {
+  if (shockButton) {
+    shockButton.classList.add("activate");
+  }
+}
 
-/* POWER BUTTON CLICKY */
+function deactivateShockButton() {
+  if (shockButton) {
+    shockButton.classList.remove("activate");
+  }
+}
+
+shockButton.addEventListener("click", function() {
+  if (!powerOn || !shockButton.classList.contains("activate")) {
+    return;
+  }
+
+  stopIndicatorAlert();
+  deactivateShockButton();
+
+  const beep4Audio = new Audio("audio/beep4.mp3");
+  beep4Audio.play().catch(error => console.log("Beep4 play error:", error));
+});
+
 powerButton.addEventListener("click", function() {
   console.log("Power button clicked! PowerOn state before:", powerOn);
   powerOn = !powerOn;
@@ -117,6 +139,12 @@ function resetToInitialState() {
   padConnector.classList.remove("completed");
   padConnector.style.pointerEvents = "auto";
   padConnector.style.opacity = "1";
+  
+  // Reset indicator bulbs
+  stopIndicatorAlert();
+  
+  // Reset shock button
+  deactivateShockButton();
   
   // Hide popup
   padPopup.classList.add("hidden");
