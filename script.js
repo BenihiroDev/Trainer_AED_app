@@ -63,25 +63,6 @@ function stopIndicatorAlert() {
   if (indicator2) indicator2.classList.remove("alert-2");
 }
 
-function activateShockButton() {
-  if (shockButton) {
-    shockButton.classList.add("alert");
-  }
-}
-
-function deactivateShockButton() {
-  if (shockButton) {
-    shockButton.classList.remove("alert");
-  }
-}
-
-// When the shock button is pressed, stop the alert state
-if (shockButton) {
-  shockButton.addEventListener("click", function() {
-    deactivateShockButton();
-  });
-}
-
 
 /* POWER BUTTON CLICKY */
 powerButton.addEventListener("click", function() {
