@@ -75,11 +75,12 @@ button:active {
  border: none;
   background-color: green;
   color: white;
-    font-size: 5vw;
+    font-size: 15vw;
     color: rgb(170, 205, 170);
     display: flex;
     justify-content: center;
     align-items: center;
+    font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif;
 }
 
 #power-button.on {
@@ -163,12 +164,13 @@ position: absolute;
 
 #shock-icon {
     position: absolute;
-    bottom: 10.5%;           
-    right: 20.5%;
-    font-size: 5vw;     /* adjust size */
+    bottom: 7%;           
+    right: 26%;
+    font-size: 15vw;     /* adjust size */
     color: rgb(168, 97, 58);
     pointer-events: none;   /* icon doesn’t block clicks */
     z-index: 2;
+    font-family: "Segoe UI Symbol", "Apple Symbols", sans-serif;
 }
 
 
