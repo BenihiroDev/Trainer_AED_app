@@ -9,7 +9,6 @@ console.log("Power Button found:", powerButton);
 console.log("Pad Connector found:", padConnector);
 
 let powerOn = false;
-let pressTimer;
 
 // Prevent context menu (right-click) to disable saving/sharing
 document.addEventListener('contextmenu', function(e) {
@@ -149,24 +148,11 @@ function resetToInitialState() {
   // Hide popup
   padPopup.classList.add("hidden");
 }
-function startPress() {
+padConnector.addEventListener("click", function() {
   if (powerOn) {
-    pressTimer = setTimeout(function() {
-      padPopup.classList.remove("hidden");
-    }, 100);
+    padPopup.classList.remove("hidden");
   }
-}
-
-function cancelPress() {
-  clearTimeout(pressTimer);
-}
-
-padConnector.addEventListener("mousedown", startPress);
-padConnector.addEventListener("mouseup", cancelPress);
-padConnector.addEventListener("mouseleave", cancelPress);
-
-padConnector.addEventListener("touchstart", startPress);
-padConnector.addEventListener("touchend", cancelPress);
+});
 
 
 /* PADS POP-UP CLOSE */
