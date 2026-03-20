@@ -25,6 +25,13 @@ let powerOnSequenceTimeout = null;
 let padButtonTouchedThisPowerCycle = false;
 let padsReminderStartTimeout = null;
 let padsReminderRepeatTimeout = null;
+let padsSnapped = false;
+let analyzeAudio = null;
+let shockAdvisedAudio = null;
+let shockDeliveredAudio = null;
+let shockAdvisedStartTimeout = null;
+let chargingBeepAudio = null;
+let chargingBeepStartTimeout = null;
 
 powerOnBeep.preload = "auto";
 applyPadsPromptAudio.preload = "auto";
@@ -180,9 +187,19 @@ function startIndicatorAlert() {
   if (indicator2) indicator2.classList.add("alert-2");
 }
 
+function startAnalyzeIndicatorAlert() {
+  if (indicator1) indicator1.classList.add("analyze-1");
+}
+
+function startPostShockIndicatorAlert() {
+  if (indicator2) indicator2.classList.add("post-shock-green");
+}
+
 function stopIndicatorAlert() {
   if (indicator1) indicator1.classList.remove("alert-1");
   if (indicator2) indicator2.classList.remove("alert-2");
+  if (indicator1) indicator1.classList.remove("analyze-1");
+  if (indicator2) indicator2.classList.remove("post-shock-green");
 }
 
 function activateShockButton() {
@@ -201,16 +218,61 @@ function arePadsCorrectlyPlaced() {
   return padZoneMap.pad1 !== null && padZoneMap.pad2 !== null;
 }
 
+function stopChargingBeep() {
+  clearTimeout(chargingBeepStartTimeout);
+  chargingBeepStartTimeout = null;
+  if (chargingBeepAudio) {
+    chargingBeepAudio.pause();
+    chargingBeepAudio.currentTime = 0;
+    chargingBeepAudio = null;
+  }
+}
+
+function stopRhythmAndShockSequence() {
+  if (shockAdvisedStartTimeout !== null) {
+    clearTimeout(shockAdvisedStartTimeout);
+    shockAdvisedStartTimeout = null;
+  }
+
+  stopChargingBeep();
+
+  if (analyzeAudio) {
+    analyzeAudio.pause();
+    analyzeAudio.currentTime = 0;
+    analyzeAudio.onended = null;
+    analyzeAudio = null;
+  }
+
+  if (shockAdvisedAudio) {
+    shockAdvisedAudio.pause();
+    shockAdvisedAudio.currentTime = 0;
+    shockAdvisedAudio.onended = null;
+    shockAdvisedAudio = null;
+  }
+
+  if (shockDeliveredAudio) {
+    shockDeliveredAudio.pause();
+    shockDeliveredAudio.currentTime = 0;
+    shockDeliveredAudio.onended = null;
+    shockDeliveredAudio = null;
+  }
+}
+
 shockButton.addEventListener("click", function() {
   if (!powerOn || !shockButton.classList.contains("activate")) {
     return;
   }
 
+  // Stop any in-flight rhythm/charging voice prompts immediately.
+  stopRhythmAndShockSequence();
   stopIndicatorAlert();
   deactivateShockButton();
 
-  const beep4Audio = new Audio("audio/beep4.mp3");
-  beep4Audio.play().catch(error => console.log("Beep4 play error:", error));
+  shockDeliveredAudio = new Audio("audio/shock-delivered-start-cpr.mp3");
+  shockDeliveredAudio.play().catch(error => console.log("Shock delivered audio play error:", error));
+
+  // After shock delivery, show lower green blink at 100 BPM.
+  startPostShockIndicatorAlert();
 });
 
 powerButton.addEventListener("click", function() {
@@ -242,6 +304,7 @@ function resetToInitialState() {
   // Reset pad zone map
   padZoneMap.pad1 = null;
   padZoneMap.pad2 = null;
+  padsSnapped = false;
   
   // Reset pad positions and styles
   const pad1 = document.getElementById("pad1");
@@ -269,6 +332,9 @@ function resetToInitialState() {
   padConnector.style.pointerEvents = "auto";
   padConnector.style.opacity = "1";
   
+  // Stop charging beep if running
+  stopRhythmAndShockSequence();
+
   // Reset indicator bulbs
   stopIndicatorAlert();
   
@@ -423,24 +489,41 @@ function checkAndSnapPads() {
   }
   
   // Check if both pads are successfully snapped
-  if (padZoneMap.pad1 !== null && padZoneMap.pad2 !== null) {
+  if (padZoneMap.pad1 !== null && padZoneMap.pad2 !== null && !padsSnapped) {
+    padsSnapped = true;
     // Once pads are correctly placed, stop pending/playing apply-pads prompts.
     stopApplyPadsPrompts();
+    stopRhythmAndShockSequence();
 
     // Change pad connector to completed state (stops blinking, keeps darker color)
     padConnector.classList.remove("active");
     padConnector.classList.add("completed");
     padConnector.style.pointerEvents = "none";
     
-    // Play beep2, then enable shock when it ends
-    const beep2Audio = new Audio("audio/beep2.mp3");
-    beep2Audio.play().catch(error => console.log("Beep2 play error:", error));
-    
-    beep2Audio.onended = function() {
-      // Start alternating red blink on the indicator bulbs
-      startIndicatorAlert();
+    // Play analyzing-heart-rhythm prompt
+    analyzeAudio = new Audio("audio/analyzing-heart-rhythm-do-not-touch-patient.mp3");
+    startAnalyzeIndicatorAlert();
+    analyzeAudio.play().catch(error => console.log("Analyze audio play error:", error));
 
-      activateShockButton();
+    analyzeAudio.onended = function() {
+      // 0.5s gap before shock-advised audio
+      shockAdvisedStartTimeout = setTimeout(function() {
+        shockAdvisedStartTimeout = null;
+        shockAdvisedAudio = new Audio("audio/shock-advised-charging-stay-clear-deliver-shock-now.mp3");
+
+        // Transition from analyze top-only blink to alternating red alert blink.
+        stopIndicatorAlert();
+        startIndicatorAlert();
+
+        shockAdvisedAudio.play().catch(error => console.log("Shock advised audio play error:", error));
+
+        // "deliver shock now" starts at ~7.62s into the audio — begin beep overlay and activate shock button then
+        chargingBeepStartTimeout = setTimeout(function() {
+          chargingBeepAudio = new Audio("audio/beep5-60s.mp3");
+          chargingBeepAudio.play().catch(error => console.log("Charging beep play error:", error));
+          activateShockButton();
+        }, 7620);
+      }, 500);
     };
     
     // Close popup after a delay to let user see the snap
