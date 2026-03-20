@@ -1,14 +1,137 @@
 const powerButton = document.getElementById("power-button");
-const beep = new Audio("audio/beep.mp3");
+const powerOnBeep = new Audio("audio/beep3.mp3");
+const applyPadsPromptAudio = new Audio("audio/apply-pads-plug-in-connector.mp3");
+const applyPadsShortPromptAudio = new Audio("audio/apply-pads-plug-in-connector-short.mp3");
+const SWITCH_SOUND_POOL_SIZE = 5;
+const switchSoundPool = Array.from({ length: SWITCH_SOUND_POOL_SIZE }, () => {
+  const audio = new Audio("audio/switch.mp3");
+  audio.preload = "auto";
+  audio.load();
+  return audio;
+});
+let switchSoundIndex = 0;
 const padConnector = document.getElementById("pad-connector");
 const padPopup = document.getElementById("pad-popup");
 const closePopup = document.getElementById("close-popup");
+const padWarningPopup = document.getElementById("pad-warning-popup");
+const closeWarningPopup = document.getElementById("close-warning-popup");
 
 // Debug: Verify elements are found
 console.log("Power Button found:", powerButton);
 console.log("Pad Connector found:", padConnector);
 
 let powerOn = false;
+let powerOnSequenceTimeout = null;
+let padButtonTouchedThisPowerCycle = false;
+let padsReminderStartTimeout = null;
+let padsReminderRepeatTimeout = null;
+
+powerOnBeep.preload = "auto";
+applyPadsPromptAudio.preload = "auto";
+applyPadsShortPromptAudio.preload = "auto";
+
+function stopPadsReminderLoop() {
+  if (padsReminderStartTimeout !== null) {
+    clearTimeout(padsReminderStartTimeout);
+    padsReminderStartTimeout = null;
+  }
+
+  if (padsReminderRepeatTimeout !== null) {
+    clearTimeout(padsReminderRepeatTimeout);
+    padsReminderRepeatTimeout = null;
+  }
+
+  applyPadsShortPromptAudio.pause();
+  applyPadsShortPromptAudio.currentTime = 0;
+  applyPadsShortPromptAudio.onended = null;
+}
+
+function stopApplyPadsPrompts() {
+  stopPadsReminderLoop();
+  applyPadsPromptAudio.pause();
+  applyPadsPromptAudio.currentTime = 0;
+  applyPadsPromptAudio.onended = null;
+}
+
+function schedulePadsReminderStart() {
+  stopPadsReminderLoop();
+
+  padsReminderStartTimeout = setTimeout(function playReminderIfNeeded() {
+    if (!powerOn || padButtonTouchedThisPowerCycle) {
+      return;
+    }
+
+    applyPadsShortPromptAudio.currentTime = 0;
+    applyPadsShortPromptAudio.play().catch(error => {
+      console.log("Apply pads short prompt play error:", error);
+    });
+
+    applyPadsShortPromptAudio.onended = function() {
+      if (!powerOn || padButtonTouchedThisPowerCycle) {
+        return;
+      }
+
+      // Repeat every 10 seconds after each reminder ends.
+      padsReminderRepeatTimeout = setTimeout(playReminderIfNeeded, 10000);
+    };
+  }, 5000);
+}
+
+function stopPowerOnAudioSequence() {
+  if (powerOnSequenceTimeout !== null) {
+    clearTimeout(powerOnSequenceTimeout);
+    powerOnSequenceTimeout = null;
+  }
+
+  powerOnBeep.pause();
+  powerOnBeep.currentTime = 0;
+  powerOnBeep.onended = null;
+
+  stopApplyPadsPrompts();
+}
+
+function playPowerOnAudioSequence() {
+  stopPowerOnAudioSequence();
+
+  // Leave a short gap for the switch click sound before startup prompts.
+  powerOnSequenceTimeout = setTimeout(function() {
+    if (!powerOn) return;
+
+    powerOnBeep.currentTime = 0;
+    powerOnBeep.play().catch(error => console.log("Beep3 play error:", error));
+
+    powerOnBeep.onended = function() {
+      if (!powerOn) return;
+      applyPadsPromptAudio.currentTime = 0;
+      applyPadsPromptAudio.play().catch(error => console.log("Apply pads prompt play error:", error));
+
+      applyPadsPromptAudio.onended = function() {
+        if (!powerOn || padButtonTouchedThisPowerCycle) {
+          return;
+        }
+
+        schedulePadsReminderStart();
+      };
+    };
+  }, 160);
+}
+
+function playSwitchSound() {
+  // Rotate through preloaded audio objects to minimize click-to-sound latency.
+  const audio = switchSoundPool[switchSoundIndex];
+  switchSoundIndex = (switchSoundIndex + 1) % SWITCH_SOUND_POOL_SIZE;
+  audio.currentTime = 0;
+  audio.play().catch(error => console.log("Switch sound play error:", error));
+}
+
+const SILENT_BUTTONS = new Set(["close-popup", "close-warning-popup"]);
+
+document.addEventListener("pointerdown", function(e) {
+  const pressedButton = e.target.closest("button");
+  if (pressedButton && !SILENT_BUTTONS.has(pressedButton.id)) {
+    playSwitchSound();
+  }
+});
 
 // Prevent context menu (right-click) to disable saving/sharing
 document.addEventListener('contextmenu', function(e) {
@@ -74,6 +197,10 @@ function deactivateShockButton() {
   }
 }
 
+function arePadsCorrectlyPlaced() {
+  return padZoneMap.pad1 !== null && padZoneMap.pad2 !== null;
+}
+
 shockButton.addEventListener("click", function() {
   if (!powerOn || !shockButton.classList.contains("activate")) {
     return;
@@ -90,16 +217,19 @@ powerButton.addEventListener("click", function() {
   console.log("Power button clicked! PowerOn state before:", powerOn);
   powerOn = !powerOn;
   console.log("PowerOn state after:", powerOn);
-  beep.play();
 
   if (powerOn) {
     console.log("Turning power ON");
+    padButtonTouchedThisPowerCycle = false;
+    playPowerOnAudioSequence();
     powerButton.classList.add("on");
     padConnector.classList.add("active");
     padConnector.style.pointerEvents = "auto";
     padConnector.style.opacity = "1";
   } else {
     console.log("Turning power OFF");
+    stopPowerOnAudioSequence();
+    stopPadsReminderLoop();
     powerButton.classList.remove("on");
     padConnector.classList.remove("active");
     resetToInitialState();
@@ -147,9 +277,14 @@ function resetToInitialState() {
   
   // Hide popup
   padPopup.classList.add("hidden");
+  if (padWarningPopup) {
+    padWarningPopup.classList.add("hidden");
+  }
 }
 padConnector.addEventListener("click", function() {
   if (powerOn) {
+    padButtonTouchedThisPowerCycle = true;
+    stopPadsReminderLoop();
     padPopup.classList.remove("hidden");
   }
 });
@@ -158,7 +293,17 @@ padConnector.addEventListener("click", function() {
 /* PADS POP-UP CLOSE */
 closePopup.addEventListener("click", function() {
   padPopup.classList.add("hidden");
+
+  if (!arePadsCorrectlyPlaced() && padWarningPopup) {
+    padWarningPopup.classList.remove("hidden");
+  }
 });
+
+if (closeWarningPopup) {
+  closeWarningPopup.addEventListener("click", function() {
+    padWarningPopup.classList.add("hidden");
+  });
+}
 
 
 /* UTILITY: Calculate overlap percentage between pad and zone */
@@ -279,12 +424,15 @@ function checkAndSnapPads() {
   
   // Check if both pads are successfully snapped
   if (padZoneMap.pad1 !== null && padZoneMap.pad2 !== null) {
+    // Once pads are correctly placed, stop pending/playing apply-pads prompts.
+    stopApplyPadsPrompts();
+
     // Change pad connector to completed state (stops blinking, keeps darker color)
     padConnector.classList.remove("active");
     padConnector.classList.add("completed");
     padConnector.style.pointerEvents = "none";
     
-    // Play beep2, then chain beep3 when it ends
+    // Play beep2, then enable shock when it ends
     const beep2Audio = new Audio("audio/beep2.mp3");
     beep2Audio.play().catch(error => console.log("Beep2 play error:", error));
     
@@ -292,12 +440,7 @@ function checkAndSnapPads() {
       // Start alternating red blink on the indicator bulbs
       startIndicatorAlert();
 
-      const beep3Audio = new Audio("audio/beep3.mp3");
-      beep3Audio.play().catch(err => console.log("Beep3 play error:", err));
-      
-      beep3Audio.onended = function() {
-        activateShockButton();
-      };
+      activateShockButton();
     };
     
     // Close popup after a delay to let user see the snap

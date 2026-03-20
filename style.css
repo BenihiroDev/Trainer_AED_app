@@ -282,7 +282,9 @@ button:active {
   transform: translate(var(--shock-icon-x), var(--shock-icon-y));
 }
 
-#shock-button:active {
+#shock-button:active,
+#shock-button.activate:active {
+  animation: none; /* remove animation so box-shadow/transform are not overridden by keyframes */
   transform: translateY(6px);
   box-shadow:
     0 2px 1px rgba(90, 44, 0, 0.9),              /* collapsed rim */
@@ -400,6 +402,46 @@ touch-action: manipulation;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+}
+
+#pad-warning-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.warning-popup-content {
+  width: min(72vw, 340px);
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  padding: 24px 20px 20px;
+  text-align: center;
+  position: relative;
+}
+
+.warning-popup-content p {
+  margin: 0 0 16px 0;
+  font-size: clamp(14px, 3.8vw, 20px);
+  font-weight: 600;
+  color: #222;
+}
+
+#close-warning-popup {
+  min-width: 70px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 7px 14px;
+  background: white;
+  color: #333;
+  font-size: clamp(12px, 3vw, 16px);
 }
 
 .popup-content {
